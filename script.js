@@ -31,12 +31,15 @@ function resetApp() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
   try {
     loadAvatars();
     loadProfileDashboard();
   } catch (err) {
-    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    const app = document.getElementById("app");
+    if (app) {
+      app.innerHTML = '<p style="color:red;font-weight:bold;">App error: ' + err.message + '</p>';
+    }
     console.error(err);
   }
 });
