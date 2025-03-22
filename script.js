@@ -10,7 +10,17 @@ const defaultTasks = [
   "Brush Your Teeth Night"
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
+const avatars = JSON.parse(localStorage.getItem("avatars") || "{}");
+
+function saveAvatars(data) {
+  localStorage.setItem("avatars", JSON.stringify(data));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("avatars")) {
+    const starterAvatars = { Jay: "🐱", Casey: "🚀", Milly: "🌟" };
+    localStorage.setItem("avatars", JSON.stringify(starterAvatars));
+  }
   loadProfileDashboard();
 });
 
@@ -80,7 +90,6 @@ function loadChildDashboard(name) {
   let stats = getUserStats();
   if (!stats[name]) stats[name] = { points: 0, streak: 0, lastCompleted: "" };
 
-  // Check for streak
   if (completed === tasks.length && stats[name].lastCompleted !== dateKey) {
     stats[name].streak += 1;
     stats[name].points += pointsToday;
@@ -143,6 +152,16 @@ function loadParentDashboard() {
     <li>${reward.name} - ${reward.cost} pts <button onclick="redeemReward(${index})">Redeem</button></li>
   `).join("");
 
+  const avatarOptions = ["🐱", "🐶", "🦊", "🐻", "🐼", "🚀", "🦄", "🌟", "🧁"];
+  const avatarPicker = kids.map(name => {
+    return `
+      <div>
+        <strong>${name}:</strong>
+        ${avatarOptions.map(a => `<button onclick="updateAvatar('${name}', '${a}')">${a}</button>`).join(" ")}
+      </div>
+    `;
+  }).join("");
+
   app.innerHTML = `
     <h2>Parent Dashboard</h2>
     <h3>Routines</h3>
@@ -155,6 +174,8 @@ function loadParentDashboard() {
       <button onclick="addReward()">Add Reward</button>
     </div>
     <ul>${rewardList}</ul>
+    <h3>Choose Avatars</h3>
+    ${avatarPicker}
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 }
@@ -199,13 +220,6 @@ function redeemReward(index) {
   alert(`${reward.name} redeemed for ${user}!`);
   loadParentDashboard();
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (!localStorage.getItem("avatars")) {
-    const starterAvatars = { Jay: "🐱", Casey: "🚀", Milly: "🌟" };
-    localStorage.setItem("avatars", JSON.stringify(starterAvatars));
-  }
-});
 
 function updateAvatar(name, emoji) {
   avatars[name] = emoji;
