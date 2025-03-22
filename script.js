@@ -24,25 +24,21 @@ function saveAvatars(data) {
   localStorage.setItem("avatars", JSON.stringify(data));
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
   try {
-
-  loadAvatars();
-      loadProfileDashboard();
+    loadAvatars();
+    loadProfileDashboard();
   } catch (err) {
     document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
     console.error(err);
   }
 });
 
-() {
-  return new Date().toLocaleDateString('en-AU', { weekday: 'long'   } catch (err) {
-    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
-    console.error(err);
-  }
+  loadAvatars();
+  loadProfileDashboard();
 });
-
+() {
+  return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
 }
 
 function getRoutineData() {
@@ -208,18 +204,8 @@ function saveParentRoutines() {
       const textarea = document.getElementById(`${kid}_${day}`);
       const tasks = textarea.value.split(',').map(t => t.trim()).filter(Boolean);
       data[kid][day] = tasks;
-      } catch (err) {
-    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
-    console.error(err);
-  }
-});
-
-    } catch (err) {
-    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
-    console.error(err);
-  }
-});
-
+    });
+  });
 
   saveRoutineData(data);
   alert("Routines saved!");
@@ -230,12 +216,7 @@ function addReward() {
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) return alert("Please enter valid reward details.");
   const rewards = getRewards();
-  rewards.push({ name, cost   } catch (err) {
-    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
-    console.error(err);
-  }
-});
-
+  rewards.push({ name, cost });
   saveRewards(rewards);
   loadParentDashboard();
 }
