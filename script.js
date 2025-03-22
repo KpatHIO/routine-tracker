@@ -24,6 +24,13 @@ function saveAvatars(data) {
   localStorage.setItem("avatars", JSON.stringify(data));
 }
 
+function resetApp() {
+  if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   try {
     loadAvatars();
@@ -127,7 +134,7 @@ function loadChildDashboard(name) {
     </div>
     <p>⭐ Points: ${stats[name].points} &nbsp;&nbsp; 🔥 Streak: ${stats[name].streak} day(s)</p>
     <ul class="task-list">${taskListHTML}</ul>
-    <button onclick="resetApp()">🧹 Reset App</button><br><br><button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
+    <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 
   localStorage.setItem(taskKey, JSON.stringify(tasks));
@@ -189,7 +196,7 @@ function loadParentDashboard() {
     <ul>${rewardList}</ul>
     <h3>Choose Avatars</h3>
     ${avatarPicker}
-    <button onclick="resetApp()">🧹 Reset App</button><br><br><button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
+    <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 }
 
@@ -216,33 +223,4 @@ function addReward() {
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) return alert("Please enter valid reward details.");
   const rewards = getRewards();
-  rewards.push({ name, cost });
-  saveRewards(rewards);
-  loadParentDashboard();
-}
-
-function redeemReward(index) {
-  const rewards = getRewards();
-  const reward = rewards[index];
-  const user = prompt("Enter child name to redeem for (Jay, Casey, Milly):");
-  if (!["Jay", "Casey", "Milly"].includes(user)) return alert("Invalid name.");
-  const stats = getUserStats();
-  if (stats[user].points < reward.cost) return alert("Not enough points.");
-  stats[user].points -= reward.cost;
-  saveUserStats(stats);
-  alert(`${reward.name} redeemed for ${user}!`);
-  loadParentDashboard();
-}
-
-function updateAvatar(name, emoji) {
-  avatars[name] = emoji;
-  saveAvatars(avatars);
-  loadParentDashboard();
-}
-
-function resetApp() {
-  if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
-    localStorage.clear();
-    location.reload();
-  }
-}
+  rewards.push({ name, cost 
