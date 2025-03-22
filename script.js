@@ -48,15 +48,15 @@ function loadProfileDashboard() {
     <h2 class="title">Who's checking in?</h2>
     <div class="profile-grid">
       <div class="profile-card" onclick="loadChildDashboard('Jay')">
-        <div class="avatar">J</div>
+        <div class="avatar">${avatars['Jay'] || 'J'}</div>
         <p>Jay</p>
       </div>
       <div class="profile-card" onclick="loadChildDashboard('Casey')">
-        <div class="avatar">C</div>
+        <div class="avatar">${avatars['Casey'] || 'C'}</div>
         <p>Casey</p>
       </div>
       <div class="profile-card" onclick="loadChildDashboard('Milly')">
-        <div class="avatar">M</div>
+        <div class="avatar">${avatars['Milly'] || 'M'}</div>
         <p>Milly</p>
       </div>
     </div>
@@ -98,7 +98,7 @@ function loadChildDashboard(name) {
   `).join("");
 
   app.innerHTML = `
-    <h2>Hi ${name}!</h2>
+    <h2>${avatars[name] || "👤"} Hi ${name}!</h2>
     <p>Here's your routine for ${today}:</p>
     <div class="progress-bar">
       <div class="progress" style="width: ${progress}%;">${progress}%</div>
@@ -197,5 +197,18 @@ function redeemReward(index) {
   stats[user].points -= reward.cost;
   saveUserStats(stats);
   alert(`${reward.name} redeemed for ${user}!`);
+  loadParentDashboard();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("avatars")) {
+    const starterAvatars = { Jay: "🐱", Casey: "🚀", Milly: "🌟" };
+    localStorage.setItem("avatars", JSON.stringify(starterAvatars));
+  }
+});
+
+function updateAvatar(name, emoji) {
+  avatars[name] = emoji;
+  saveAvatars(avatars);
   loadParentDashboard();
 }
