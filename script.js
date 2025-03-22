@@ -10,7 +10,6 @@ const defaultTasks = [
   "Brush Your Teeth Night"
 ];
 
-// Load dashboard on startup
 document.addEventListener('DOMContentLoaded', () => {
   loadProfileDashboard();
 });
@@ -25,6 +24,22 @@ function getRoutineData() {
 
 function saveRoutineData(data) {
   localStorage.setItem("routineData", JSON.stringify(data));
+}
+
+function getRewards() {
+  return JSON.parse(localStorage.getItem("rewardData") || "[]");
+}
+
+function saveRewards(data) {
+  localStorage.setItem("rewardData", JSON.stringify(data));
+}
+
+function getUserStats() {
+  return JSON.parse(localStorage.getItem("userStats") || "{}");
+}
+
+function saveUserStats(stats) {
+  localStorage.setItem("userStats", JSON.stringify(stats));
 }
 
 function loadProfileDashboard() {
@@ -54,8 +69,24 @@ function loadChildDashboard(name) {
   const today = getTodayKey();
   const routines = getRoutineData();
   const todayTasks = (routines[name] && routines[name][today]) || defaultTasks;
-  const key = `${name}_${new Date().toLocaleDateString()}`;
-  let tasks = JSON.parse(localStorage.getItem(key)) || todayTasks.map(task => ({ text: task, done: false }));
+  const dateKey = new Date().toLocaleDateString();
+  const taskKey = `${name}_${dateKey}`;
+  let tasks = JSON.parse(localStorage.getItem(taskKey)) || todayTasks.map(task => ({ text: task, done: false }));
+
+  const completed = tasks.filter(t => t.done).length;
+  const progress = Math.round((completed / tasks.length) * 100);
+  const pointsToday = completed;
+
+  let stats = getUserStats();
+  if (!stats[name]) stats[name] = { points: 0, streak: 0, lastCompleted: "" };
+
+  // Check for streak
+  if (completed === tasks.length && stats[name].lastCompleted !== dateKey) {
+    stats[name].streak += 1;
+    stats[name].points += pointsToday;
+    stats[name].lastCompleted = dateKey;
+    saveUserStats(stats);
+  }
 
   const taskListHTML = tasks.map((task, index) => `
     <li>
@@ -66,19 +97,18 @@ function loadChildDashboard(name) {
     </li>
   `).join("");
 
-  const progress = Math.round((tasks.filter(t => t.done).length / tasks.length) * 100);
-
   app.innerHTML = `
     <h2>Hi ${name}!</h2>
     <p>Here's your routine for ${today}:</p>
     <div class="progress-bar">
       <div class="progress" style="width: ${progress}%;">${progress}%</div>
     </div>
+    <p>⭐ Points: ${stats[name].points} &nbsp;&nbsp; 🔥 Streak: ${stats[name].streak} day(s)</p>
     <ul class="task-list">${taskListHTML}</ul>
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 
-  localStorage.setItem(key, JSON.stringify(tasks));
+  localStorage.setItem(taskKey, JSON.stringify(tasks));
 }
 
 function toggleTask(name, index) {
@@ -94,26 +124,37 @@ function loadParentDashboard() {
   const app = document.getElementById('app');
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const kids = ["Jay", "Casey", "Milly"];
+  const routines = getRoutineData();
+  const rewards = getRewards();
 
-  const formHTML = kids.map(kid => {
+  const routineEditor = kids.map(kid => {
     return days.map(day => {
-      const routines = getRoutineData();
       const currentTasks = (routines[kid] && routines[kid][day]) || [];
-
       return `
         <div class="routine-block">
           <h4>${kid} - ${day}</h4>
-          <textarea id="${kid}_${day}" rows="3" placeholder="Enter tasks separated by commas">${currentTasks.join(", ")}</textarea>
+          <textarea id="${kid}_${day}" rows="2" placeholder="Enter tasks separated by commas">${currentTasks.join(", ")}</textarea>
         </div>
       `;
     }).join("");
   }).join("");
 
+  const rewardList = rewards.map((reward, index) => `
+    <li>${reward.name} - ${reward.cost} pts <button onclick="redeemReward(${index})">Redeem</button></li>
+  `).join("");
+
   app.innerHTML = `
     <h2>Parent Dashboard</h2>
-    <p>Edit routines by child and day of the week:</p>
-    ${formHTML}
+    <h3>Routines</h3>
+    ${routineEditor}
     <button onclick="saveParentRoutines()">💾 Save Routines</button>
+    <h3>Rewards</h3>
+    <div>
+      <input id="rewardName" placeholder="Reward Name" />
+      <input id="rewardCost" type="number" placeholder="Points Cost" />
+      <button onclick="addReward()">Add Reward</button>
+    </div>
+    <ul>${rewardList}</ul>
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 }
@@ -134,4 +175,27 @@ function saveParentRoutines() {
 
   saveRoutineData(data);
   alert("Routines saved!");
+}
+
+function addReward() {
+  const name = document.getElementById("rewardName").value.trim();
+  const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
+  if (!name || isNaN(cost)) return alert("Please enter valid reward details.");
+  const rewards = getRewards();
+  rewards.push({ name, cost });
+  saveRewards(rewards);
+  loadParentDashboard();
+}
+
+function redeemReward(index) {
+  const rewards = getRewards();
+  const reward = rewards[index];
+  const user = prompt("Enter child name to redeem for (Jay, Casey, Milly):");
+  if (!["Jay", "Casey", "Milly"].includes(user)) return alert("Invalid name.");
+  const stats = getUserStats();
+  if (stats[user].points < reward.cost) return alert("Not enough points.");
+  stats[user].points -= reward.cost;
+  saveUserStats(stats);
+  alert(`${reward.name} redeemed for ${user}!`);
+  loadParentDashboard();
 }
