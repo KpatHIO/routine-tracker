@@ -24,12 +24,25 @@ function saveAvatars(data) {
   localStorage.setItem("avatars", JSON.stringify(data));
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
+  try {
+
   loadAvatars();
-  loadProfileDashboard();
+      loadProfileDashboard();
+  } catch (err) {
+    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    console.error(err);
+  }
 });
+
 () {
-  return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
+  return new Date().toLocaleDateString('en-AU', { weekday: 'long'   } catch (err) {
+    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    console.error(err);
+  }
+});
+
 }
 
 function getRoutineData() {
@@ -118,7 +131,7 @@ function loadChildDashboard(name) {
     </div>
     <p>⭐ Points: ${stats[name].points} &nbsp;&nbsp; 🔥 Streak: ${stats[name].streak} day(s)</p>
     <ul class="task-list">${taskListHTML}</ul>
-    <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
+    <button onclick="resetApp()">🧹 Reset App</button><br><br><button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 
   localStorage.setItem(taskKey, JSON.stringify(tasks));
@@ -180,7 +193,7 @@ function loadParentDashboard() {
     <ul>${rewardList}</ul>
     <h3>Choose Avatars</h3>
     ${avatarPicker}
-    <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
+    <button onclick="resetApp()">🧹 Reset App</button><br><br><button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 }
 
@@ -195,8 +208,18 @@ function saveParentRoutines() {
       const textarea = document.getElementById(`${kid}_${day}`);
       const tasks = textarea.value.split(',').map(t => t.trim()).filter(Boolean);
       data[kid][day] = tasks;
-    });
-  });
+      } catch (err) {
+    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    console.error(err);
+  }
+});
+
+    } catch (err) {
+    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    console.error(err);
+  }
+});
+
 
   saveRoutineData(data);
   alert("Routines saved!");
@@ -207,7 +230,12 @@ function addReward() {
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) return alert("Please enter valid reward details.");
   const rewards = getRewards();
-  rewards.push({ name, cost });
+  rewards.push({ name, cost   } catch (err) {
+    document.getElementById('app').innerHTML = '<p style="color:red; font-weight:bold;">An error occurred loading the app: ' + err.message + '</p>';
+    console.error(err);
+  }
+});
+
   saveRewards(rewards);
   loadParentDashboard();
 }
@@ -229,4 +257,11 @@ function updateAvatar(name, emoji) {
   avatars[name] = emoji;
   saveAvatars(avatars);
   loadParentDashboard();
+}
+
+function resetApp() {
+  if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
+    localStorage.clear();
+    location.reload();
+  }
 }
