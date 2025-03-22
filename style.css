@@ -1,1 +1,88 @@
-/* placeholder for working style.css */
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f9fc;
+  color: #333;
+}
+
+#app {
+  max-width: 600px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.profile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.profile-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  width: 100px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.avatar {
+  font-size: 2rem;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.progress-bar {
+  background-color: #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 1rem 0;
+  height: 25px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  line-height: 25px;
+  font-weight: bold;
+  transition: width 0.3s ease;
+}
+
+.task-list li {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+.task-list li label {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+  gap: 1rem;
+  width: 100%;
+}
+
+.task-list li input[type="checkbox"] {
+  width: 26px;
+  height: 26px;
+  accent-color: #4CAF50;
+}
