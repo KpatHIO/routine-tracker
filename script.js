@@ -73,6 +73,28 @@ function saveUserStats(stats) {
   localStorage.setItem("userStats", JSON.stringify(stats));
 }
 
+function loadProfileDashboard() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <h2 class="title">Who's checking in?</h2>
+    <div class="profile-grid">
+      <div class="profile-card" onclick="loadChildDashboard('Jay')">
+        <div class="avatar">${avatars['Jay'] || 'J'}</div>
+        <p>Jay</p>
+      </div>
+      <div class="profile-card" onclick="loadChildDashboard('Casey')">
+        <div class="avatar">${avatars['Casey'] || 'C'}</div>
+        <p>Casey</p>
+      </div>
+      <div class="profile-card" onclick="loadChildDashboard('Milly')">
+        <div class="avatar">${avatars['Milly'] || 'M'}</div>
+        <p>Milly</p>
+      </div>
+    </div>
+    <button class="parent-button" onclick="loadParentDashboard()">Parent Mode</button>
+  `;
+}
+
 function toggleTask(name, index) {
   const today = new Date().toLocaleDateString();
   const key = `${name}_${today}`;
@@ -179,26 +201,4 @@ function updateAvatar(name, emoji) {
   avatars[name] = emoji;
   saveAvatars(avatars);
   loadParentDashboard();
-}
-
-function loadProfileDashboard() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <h2 class="title">Who's checking in?</h2>
-    <div class="profile-grid">
-      <div class="profile-card" onclick="loadChildDashboard('Jay')">
-        <div class="avatar">${avatars['Jay'] || 'J'}</div>
-        <p>Jay</p>
-      </div>
-      <div class="profile-card" onclick="loadChildDashboard('Casey')">
-        <div class="avatar">${avatars['Casey'] || 'C'}</div>
-        <p>Casey</p>
-      </div>
-      <div class="profile-card" onclick="loadChildDashboard('Milly')">
-        <div class="avatar">${avatars['Milly'] || 'M'}</div>
-        <p>Milly</p>
-      </div>
-    </div>
-    <button class="parent-button" onclick="loadParentDashboard()">Parent Mode</button>
-  `;
 }
