@@ -101,7 +101,11 @@ function loadChildDashboard(name) {
   const todayTasks = (routines[name] && routines[name][today]) || defaultTasks;
   const dateKey = new Date().toLocaleDateString();
   const taskKey = `${name}_${dateKey}`;
-  let tasks = JSON.parse(localStorage.getItem(taskKey)) || todayTasks.map(task => ({ text: task, done: false }));
+  let savedProgress = JSON.parse(localStorage.getItem(taskKey));
+  let tasks = todayTasks.map(task => {
+    const existing = savedProgress ? savedProgress.find(t => t.text === task) : null;
+    return { text: task, done: existing ? existing.done : false };
+  });
 
   const completed = tasks.filter(t => t.done).length;
   const progress = Math.round((completed / tasks.length) * 100);
