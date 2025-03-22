@@ -25,7 +25,7 @@ function saveAvatars(data) {
 }
 
 function resetApp() {
-  if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
+  if (confirm("Are you sure you want to clear all saved data?")) {
     localStorage.clear();
     location.reload();
   }
@@ -44,10 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-  loadAvatars();
-  loadProfileDashboard();
-});
-() {
+function getTodayKey() {
   return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
 }
 
@@ -199,6 +196,7 @@ function loadParentDashboard() {
     <ul>${rewardList}</ul>
     <h3>Choose Avatars</h3>
     ${avatarPicker}
+    <button onclick="resetApp()">🧹 Reset App</button><br><br>
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 }
@@ -226,4 +224,26 @@ function addReward() {
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) return alert("Please enter valid reward details.");
   const rewards = getRewards();
-  rewards.push({ name, cost 
+  rewards.push({ name, cost });
+  saveRewards(rewards);
+  loadParentDashboard();
+}
+
+function redeemReward(index) {
+  const rewards = getRewards();
+  const reward = rewards[index];
+  const user = prompt("Enter child name to redeem for (Jay, Casey, Milly):");
+  if (!["Jay", "Casey", "Milly"].includes(user)) return alert("Invalid name.");
+  const stats = getUserStats();
+  if (stats[user].points < reward.cost) return alert("Not enough points.");
+  stats[user].points -= reward.cost;
+  saveUserStats(stats);
+  alert(`${reward.name} redeemed for ${user}!`);
+  loadParentDashboard();
+}
+
+function updateAvatar(name, emoji) {
+  avatars[name] = emoji;
+  saveAvatars(avatars);
+  loadParentDashboard();
+}
