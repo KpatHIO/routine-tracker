@@ -1,5 +1,4 @@
 
-/* Base style */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -64,7 +63,6 @@ button {
   transition: width 0.3s ease;
 }
 
-/* Improved checkbox styles */
 .task-list li {
   list-style: none;
   margin-bottom: 1rem;
