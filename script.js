@@ -15,6 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProfileDashboard();
 });
 
+function getTodayKey() {
+  return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
+}
+
+function getRoutineData() {
+  return JSON.parse(localStorage.getItem("routineData") || "{}");
+}
+
+function saveRoutineData(data) {
+  localStorage.setItem("routineData", JSON.stringify(data));
+}
+
 function loadProfileDashboard() {
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -39,10 +51,11 @@ function loadProfileDashboard() {
 
 function loadChildDashboard(name) {
   const app = document.getElementById('app');
-
-  const today = new Date().toLocaleDateString();
-  const key = `${name}_${today}`;
-  let tasks = JSON.parse(localStorage.getItem(key)) || defaultTasks.map(task => ({ text: task, done: false }));
+  const today = getTodayKey();
+  const routines = getRoutineData();
+  const todayTasks = (routines[name] && routines[name][today]) || defaultTasks;
+  const key = `${name}_${new Date().toLocaleDateString()}`;
+  let tasks = JSON.parse(localStorage.getItem(key)) || todayTasks.map(task => ({ text: task, done: false }));
 
   const taskListHTML = tasks.map((task, index) => `
     <li>
@@ -57,13 +70,11 @@ function loadChildDashboard(name) {
 
   app.innerHTML = `
     <h2>Hi ${name}!</h2>
-    <p>Here's your routine for today:</p>
+    <p>Here's your routine for ${today}:</p>
     <div class="progress-bar">
       <div class="progress" style="width: ${progress}%;">${progress}%</div>
     </div>
-    <ul class="task-list">
-      ${taskListHTML}
-    </ul>
+    <ul class="task-list">${taskListHTML}</ul>
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
 
@@ -81,9 +92,46 @@ function toggleTask(name, index) {
 
 function loadParentDashboard() {
   const app = document.getElementById('app');
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const kids = ["Jay", "Casey", "Milly"];
+
+  const formHTML = kids.map(kid => {
+    return days.map(day => {
+      const routines = getRoutineData();
+      const currentTasks = (routines[kid] && routines[kid][day]) || [];
+
+      return `
+        <div class="routine-block">
+          <h4>${kid} - ${day}</h4>
+          <textarea id="${kid}_${day}" rows="3" placeholder="Enter tasks separated by commas">${currentTasks.join(", ")}</textarea>
+        </div>
+      `;
+    }).join("");
+  }).join("");
+
   app.innerHTML = `
     <h2>Parent Dashboard</h2>
-    <p>Coming soon: Manage routines, tasks, and rewards.</p>
+    <p>Edit routines by child and day of the week:</p>
+    ${formHTML}
+    <button onclick="saveParentRoutines()">💾 Save Routines</button>
     <button onclick="loadProfileDashboard()">⬅️ Back to Profiles</button>
   `;
+}
+
+function saveParentRoutines() {
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const kids = ["Jay", "Casey", "Milly"];
+  const data = {};
+
+  kids.forEach(kid => {
+    data[kid] = {};
+    days.forEach(day => {
+      const textarea = document.getElementById(`${kid}_${day}`);
+      const tasks = textarea.value.split(',').map(t => t.trim()).filter(Boolean);
+      data[kid][day] = tasks;
+    });
+  });
+
+  saveRoutineData(data);
+  alert("Routines saved!");
 }
