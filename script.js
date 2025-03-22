@@ -10,21 +10,25 @@ const defaultTasks = [
   "Brush Your Teeth Night"
 ];
 
-const avatars = JSON.parse(localStorage.getItem("avatars") || "{}");
+let avatars = {};
+
+function loadAvatars() {
+  avatars = JSON.parse(localStorage.getItem("avatars") || "{}");
+  if (!avatars.Jay) avatars.Jay = "🐱";
+  if (!avatars.Casey) avatars.Casey = "🚀";
+  if (!avatars.Milly) avatars.Milly = "🌟";
+  localStorage.setItem("avatars", JSON.stringify(avatars));
+}
 
 function saveAvatars(data) {
   localStorage.setItem("avatars", JSON.stringify(data));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (!localStorage.getItem("avatars")) {
-    const starterAvatars = { Jay: "🐱", Casey: "🚀", Milly: "🌟" };
-    localStorage.setItem("avatars", JSON.stringify(starterAvatars));
-  }
+  loadAvatars();
   loadProfileDashboard();
 });
-
-function getTodayKey() {
+() {
   return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
 }
 

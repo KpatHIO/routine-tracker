@@ -151,3 +151,34 @@ ul.task-list li label {
 ul.task-list li {
   list-style: none;
 }
+
+@media (max-width: 600px) {
+  .profile-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-card {
+    width: 80%;
+  }
+
+  .task-list li {
+    font-size: 1rem;
+  }
+
+  .routine-block textarea {
+    font-size: 1rem;
+  }
+
+  .routine-block h4 {
+    font-size: 1.1rem;
+  }
+
+  .progress-bar {
+    height: 20px;
+  }
+
+  .progress {
+    font-size: 0.9rem;
+  }
+}
