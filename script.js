@@ -11,9 +11,9 @@ const firebaseConfig = {
   appId: "1:387314062824:web:898af34ecea35f44aa805d"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-window.db = db;
+const db = getFirestore(app);
+window.db = db; 
 
 async function getRoutineData() {
   const docRef = doc(db, "shared", "routineData");
