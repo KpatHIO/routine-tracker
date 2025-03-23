@@ -86,6 +86,7 @@ window.loadParentDashboard = async function () {
           <button onclick="window.updateAvatar('${kid}', '${a}')">${a}</button>
         `).join(" ")}
       </div>
+      <button onclick="window.resetStats('${kid}')">Reset Points</button>
     `).join("")}
     <hr><h3>Rewards</h3>
     <ul id="rewardList">
@@ -252,4 +253,13 @@ window.redeemRewardChild = async function(name, rewardName, cost) {
   await saveUserStats(stats);
   alert(`${name} redeemed "${rewardName}"!`);
   window.loadChildView(name);
+};
+
+
+window.resetStats = async function(name) {
+  const stats = await getUserStats();
+  stats[name] = { points: 0, streak: 0, lastCompleted: "" };
+  await saveUserStats(stats);
+  alert(`${name}'s stats have been reset.`);
+  window.loadParentDashboard();
 };
