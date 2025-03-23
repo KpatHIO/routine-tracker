@@ -299,7 +299,7 @@ window.updateAvatar = async function(name, emoji) {
 
 
 window.addReward = async function() {
-  const rewardName = document.getElementById("rewardName").value.trim();
+  let rewardNameInput = document.getElementById("rewardName").value.trim();
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) {
     alert("Please enter valid reward details.");
@@ -317,7 +317,7 @@ window.addReward = async function() {
   alert("Reward added!");
   loadParentDashboard();
 
-  const rewardName = document.getElementById("rewardName").value.trim();
+  let rewardNameInput = document.getElementById("rewardName").value.trim();
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) {
     alert("Please enter valid reward details.");
