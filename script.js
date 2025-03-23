@@ -326,3 +326,131 @@ window.redeemReward = async function(index) {
   alert(`${child} redeemed "${reward.name}"!`);
   loadParentDashboard();
 };
+
+
+// Modify loadChildView to show rewards and improve date UI
+window.loadChildView = async function(name) {
+  const app = document.getElementById("app");
+  const today = new Date();
+  let selectedDate = today.toISOString().split('T')[0];
+
+  const render = async () => {
+    const routines = await getRoutineData();
+    const progress = await getProgressData();
+    const stats = await getUserStats();
+    const rewards = await getRewards();
+
+    const dayName = weekdays[new Date(selectedDate).getDay()];
+    const tasks = routines[name]?.[dayName] || [];
+    const key = name + "_" + selectedDate;
+    const done = progress[key] || [];
+
+    let currentStats = stats[name] || { points: 0, streak: 0, lastCompleted: "" };
+    const isToday = selectedDate === today.toISOString().split('T')[0];
+    const allDone = tasks.length > 0 && tasks.every(task => done.includes(task));
+
+    if (isToday && allDone && currentStats.lastCompleted !== selectedDate) {
+      currentStats.points += tasks.length;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = yesterday.toISOString().split("T")[0];
+      currentStats.streak = (currentStats.lastCompleted === yesterdayKey) ? currentStats.streak + 1 : 1;
+      currentStats.lastCompleted = selectedDate;
+      stats[name] = currentStats;
+      await saveUserStats(stats);
+    }
+
+    const displayDate = new Date(selectedDate).toDateString();
+    const streakLine = `<p>⭐ Points: ${currentStats.points} | 🔥 Streak: ${currentStats.streak} days</p>`;
+
+    const rewardList = rewards.map(r => {
+      const canRedeem = currentStats.points >= r.cost;
+      return `<li>${r.name} - ${r.cost} pts ${canRedeem && isToday ? `<button onclick="redeemRewardChild('${name}', '${r.name}', ${r.cost})">Redeem</button>` : ""}</li>`;
+    }).join("");
+
+    app.innerHTML = `
+      <h2>${name}'s Tasks for ${dayName}</h2>
+      <div style="text-align:center;">
+        <button onclick="changeDate('${name}', -1)">⬅️</button>
+        <strong>${displayDate}</strong>
+        <button onclick="changeDate('${name}', 1)">➡️</button>
+      </div>
+      ${isToday ? streakLine : ""}
+      <ul class="task-list">
+        ${tasks.map((task, i) => `
+          <li>
+            <input type="checkbox" id="task_${i}" ${done.includes(task) ? "checked" : ""} ${!isToday ? "disabled" : ""} onchange="toggleTask('${name}', '${selectedDate}', '${task}')">
+            ${task}
+          </li>
+        `).join("")}
+      </ul>
+      <h3>🎁 Rewards</h3>
+      <ul>${rewardList || "No rewards yet."}</ul>
+      <button onclick="window.loadDashboard()">Back</button>
+    `;
+
+    window.currentChild = name;
+    window.currentDate = selectedDate;
+  };
+
+  window.changeDate = (name, offset) => {
+    const newDate = new Date(window.currentDate);
+    newDate.setDate(newDate.getDate() + offset);
+    selectedDate = newDate.toISOString().split('T')[0];
+    render();
+  };
+
+  render();
+};
+
+window.redeemRewardChild = async function(child, rewardName, cost) {
+  const stats = await getUserStats();
+  if ((stats[child]?.points || 0) < cost) {
+    alert("Not enough points.");
+    return;
+  }
+  stats[child].points -= cost;
+  await saveUserStats(stats);
+  alert(`${child} redeemed "${rewardName}"!`);
+  loadChildView(child);
+};
+
+// Improve reward input UX in parent dashboard
+window.loadParentDashboard = async function() {
+  const app = document.getElementById("app");
+  const routines = await getRoutineData();
+  const avatars = await getAvatars();
+  const rewards = await getRewards();
+
+  const avatarOptions = ["🐶", "🐱", "🦊", "🐸", "🐵", "🦁", "🐯", "🐼", "🐷", "🐨", "🦄"];
+
+  app.innerHTML = `
+    <h2>Parent Dashboard</h2>
+    ${kids.map(kid => `
+      <h3>${avatars[kid] || "👤"} ${kid}</h3>
+      ${weekdays.map(day => `
+        <div>
+          <strong>${day}:</strong><br>
+          <input type="text" id="${kid}_${day}" value="${(routines[kid]?.[day] || []).join(', ')}" style="width:100%;" />
+        </div>
+      `).join("")}
+      <div>
+        <label>Avatar:</label><br>
+        ${avatarOptions.map(a => `
+          <button onclick="updateAvatar('${kid}', '${a}')">${a}</button>
+        `).join(" ")}
+      </div>
+    `).join("")}
+
+    <hr><h3>Rewards</h3>
+    <ul id="rewardList">
+      ${rewards.map((r, i) => `<li>${r.name} - ${r.cost} pts <button onclick="redeemReward(${i})">Redeem</button></li>`).join("")}
+    </ul>
+    <input type="text" id="rewardName" placeholder="Reward Name" />
+    <input type="number" id="rewardCost" placeholder="Points Cost" />
+    <button onclick="addReward()">Add Reward</button>
+    <br><br>
+    <button onclick="saveParentRoutines()">Save Routines</button>
+    <button onclick="window.loadDashboard()">Back</button>
+  `;
+};
