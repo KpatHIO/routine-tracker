@@ -134,3 +134,6 @@ window.saveParentRoutines = async function() {
 };
 
 document.addEventListener("DOMContentLoaded", loadDashboard);
+
+
+window.loadDashboard = loadDashboard;
