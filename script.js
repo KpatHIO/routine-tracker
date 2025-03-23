@@ -47,7 +47,7 @@ function loadDashboard() {
       <button onclick="loadChildView('${name}')">${name}</button>
     `).join(" ")}
     <br><br>
-    <button onclick="loadParentDashboard()">Parent Mode</button>
+    <button onclick="window.loadParentDashboard()">Parent Mode</button>
   `;
 }
 
@@ -75,7 +75,7 @@ window.loadChildView = async function(name) {
           </li>
         `).join("")}
       </ul>
-      <button onclick="loadDashboard()">Back</button>
+      <button onclick="window.loadDashboard()">Back</button>
     `;
 
     document.getElementById("dayPicker").addEventListener("change", async (e) => {
@@ -97,7 +97,7 @@ window.toggleTask = async function(name, date, task) {
     progress[key].push(task);
   }
   await saveProgressData(progress);
-  setTimeout(() => loadChildView(name), 50);
+  setTimeout(() => window.loadChildView(name), 100);
 };
 
 window.loadParentDashboard = async function() {
@@ -116,7 +116,7 @@ window.loadParentDashboard = async function() {
       `).join("")}
     `).join("")}
     <br><button onclick="saveParentRoutines()">Save Routines</button>
-    <button onclick="loadDashboard()">Back</button>
+    <button onclick="window.loadDashboard()">Back</button>
   `;
 };
 
