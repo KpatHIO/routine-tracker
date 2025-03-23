@@ -46,7 +46,7 @@ const saveRewards = (data) => setDocData("shared", "rewards", { list: data });
 
 
 function renderProfileDashboard(avatars) {
-  const app = document.getElementById("app");
+  app = document.getElementById("app");
   app.innerHTML = `
     <h2>Who's checking in?</h2>
     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -61,7 +61,7 @@ function renderProfileDashboard(avatars) {
   `;
 }
 
-  const app = document.getElementById("app");
+  app = document.getElementById("app");
   app.innerHTML = `
     <h2>Who's checking in?</h2>
     ${kids.map(name => `
@@ -80,7 +80,7 @@ window.loadDashboard = async function () {
 };
 
 window.loadParentDashboard = async function () {
-  const app = document.getElementById("app");
+  app = document.getElementById("app");
   const routines = await getRoutineData();
   const avatars = await getAvatars();
   const rewards = await getRewards(); let rewardEditHTML = rewards.map((r, i) => `<li><input id="reward_name_${i}" value="${r.name}" style="width:40%"/> - <input id="reward_cost_${i}" value="${r.cost}" type="number" style="width:60px"/> pts <button onclick="window.updateReward(${i})">💾</button></li>`).join("");
@@ -155,7 +155,7 @@ window.saveParentRoutines = async function () {
 };
 
 window.loadChildView = async function(name) {
-  const app = document.getElementById("app");
+  app = document.getElementById("app");
   const today = new Date();
   let selectedDate = window.currentDate || today.toISOString().split('T')[0];
 
