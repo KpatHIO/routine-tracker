@@ -36,12 +36,17 @@ function getTodayKey() {
   return new Date().toLocaleDateString('en-AU', { weekday: 'long' });
 }
 
-function getRoutineData() {
-  return JSON.parse(localStorage.getItem("routineData") || "{}");
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+async function getRoutineData() {
+  const docRef = doc(window.db, "shared", "routineData");
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? docSnap.data() : {};
 }
 
-function saveRoutineData(data) {
-  localStorage.setItem("routineData", JSON.stringify(data));
+async function saveRoutineData(data) {
+  const docRef = doc(window.db, "shared", "routineData");
+  await setDoc(docRef, data);
 }
 
 function getRewards() {
