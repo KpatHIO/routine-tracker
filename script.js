@@ -59,6 +59,14 @@ function renderProfileDashboard(avatars) {
     <br>
     <button style="font-size:0.9em; opacity:0.7;" onclick="window.loadParentDashboard()">Parent Mode</button>
   `;
+}')">
+          ${avatars[name] || "👤"} ${name}
+        </button>
+      `).join("")}
+    </div>
+    <br>
+    <button style="font-size:0.9em; opacity:0.7;" onclick="window.loadParentDashboard()">Parent Mode</button>
+  `;
 }
 
   app = document.getElementById("app");
