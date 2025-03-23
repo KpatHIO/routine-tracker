@@ -44,18 +44,18 @@ const saveRewards = (data) => setDocData("shared", "rewards", { list: data });
 
 function renderProfileDashboard(avatars) {
   const el = document.getElementById("app");
-  el.innerHTML = \`
+  el.innerHTML = `
     <h2>Who's checking in?</h2>
     <div style="display:flex; flex-direction:column; gap:10px;">
-      ${kids.map(name => \`
+      ${kids.map(name => `
         <button style="font-size:1.5em; padding:15px;" onclick="window.loadChildView('${name}')">
           ${avatars[name] || "👤"} ${name}
         </button>
-      \`).join("")}
+      `).join("")}
     </div>
     <br>
     <button style="font-size:0.9em; opacity:0.7;" onclick="window.loadParentDashboard()">Parent Mode</button>
-  \`;
+  `;
 }
 
 window.loadDashboard = async function () {
@@ -70,32 +70,32 @@ window.loadParentDashboard = async function () {
   const rewards = await getRewards();
   const avatarOptions = ["🐶", "🐱", "🦊", "🐸", "🐵", "🦁", "🐯", "🐼", "🐷", "🐨", "🦄"];
 
-  el.innerHTML = \`
+  el.innerHTML = `
     <h2>Parent Dashboard</h2>
-    ${kids.map(kid => \`
+    ${kids.map(kid => `
       <h3>${avatars[kid] || "👤"} ${kid}</h3>
-      ${weekdays.map(day => \`
+      ${weekdays.map(day => `
         <div>
           <strong>${day}:</strong><br>
           <input type="text" id="${kid}_${day}" value="${(routines[kid]?.[day] || []).join(', ')}" style="width:100%;" />
         </div>
-      \`).join("")}
+      `).join("")}
       <div>
         <label>Avatar:</label><br>
-        ${avatarOptions.map(a => \`
+        ${avatarOptions.map(a => `
           <button onclick="window.updateAvatar('${kid}', '${a}')">${a}</button>
-        \`).join(" ")}
+        `).join(" ")}
       </div>
-    \`).join("")}
+    `).join("")}
     <hr><h3>Rewards</h3>
     <ul id="rewardList">
-      ${rewards.map((r, i) => \`
+      ${rewards.map((r, i) => `
         <li>
           <input id="reward_name_${i}" value="${r.name}" style="width:40%"/> -
           <input id="reward_cost_${i}" value="${r.cost}" type="number" style="width:60px"/> pts
           <button onclick="window.updateReward(${i})">💾</button>
         </li>
-      \`).join("")}
+      `).join("")}
     </ul>
     <input type="text" id="rewardName" placeholder="Reward Name" />
     <input type="number" id="rewardCost" placeholder="Points Cost" />
@@ -103,7 +103,7 @@ window.loadParentDashboard = async function () {
     <br><br>
     <button onclick="window.saveParentRoutines()">Save Routines</button>
     <button onclick="window.loadDashboard()">Back</button>
-  \`;
+  `;
 };
 
 window.updateAvatar = async function (name, emoji) {
@@ -133,8 +133,8 @@ window.addReward = async function () {
 
 window.updateReward = async function(index) {
   const rewards = await getRewards();
-  const name = document.getElementById(\`reward_name_${index}\`).value.trim();
-  const cost = parseInt(document.getElementById(\`reward_cost_${index}\`).value.trim(), 10);
+  const name = document.getElementById(`reward_name_${index}`).value.trim();
+  const cost = parseInt(document.getElementById(`reward_cost_${index}`).value.trim(), 10);
   if (!name || isNaN(cost)) {
     alert("Please enter valid name and cost.");
     return;
@@ -150,7 +150,7 @@ window.saveParentRoutines = async function () {
   kids.forEach(kid => {
     data[kid] = {};
     weekdays.forEach(day => {
-      const value = document.getElementById(\`${kid}_${day}\`).value;
+      const value = document.getElementById(`${kid}_${day}`).value;
       data[kid][day] = value.split(',').map(t => t.trim()).filter(Boolean);
     });
   });
