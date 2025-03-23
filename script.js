@@ -44,7 +44,23 @@ const getRewards = async () => {
 };
 const saveRewards = (data) => setDocData("shared", "rewards", { list: data });
 
+
 function renderProfileDashboard(avatars) {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <h2>Who's checking in?</h2>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      ${kids.map(name => `
+        <button style="font-size:1.5em; padding:15px;" onclick="window.loadChildView('${name}')">
+          ${avatars[name] || "👤"} ${name}
+        </button>
+      `).join("")}
+    </div>
+    <br>
+    <button style="font-size:0.9em; opacity:0.7;" onclick="window.loadParentDashboard()">Parent Mode</button>
+  `;
+}
+
   const app = document.getElementById("app");
   app.innerHTML = `
     <h2>Who's checking in?</h2>
@@ -67,7 +83,7 @@ window.loadParentDashboard = async function () {
   const app = document.getElementById("app");
   const routines = await getRoutineData();
   const avatars = await getAvatars();
-  const rewards = await getRewards();
+  const rewards = await getRewards(); let rewardEditHTML = rewards.map((r, i) => `<li><input id="reward_name_${i}" value="${r.name}" style="width:40%"/> - <input id="reward_cost_${i}" value="${r.cost}" type="number" style="width:60px"/> pts <button onclick="window.updateReward(${i})">💾</button></li>`).join("");
   const avatarOptions = ["🐶", "🐱", "🦊", "🐸", "🐵", "🦁", "🐯", "🐼", "🐷", "🐨", "🦄"];
 
   app.innerHTML = `
@@ -88,8 +104,8 @@ window.loadParentDashboard = async function () {
       </div>
     `).join("")}
     <hr><h3>Rewards</h3>
-    <ul id="rewardList">
-      ${rewards.map((r, i) => `<li>${r.name} - ${r.cost} pts</li>`).join("")}
+    <ul id="rewardList">${rewardEditHTML}
+      
     </ul>
     <input type="text" id="rewardName" placeholder="Reward Name" />
     <input type="number" id="rewardCost" placeholder="Points Cost" />
@@ -116,7 +132,7 @@ window.addReward = async function () {
     alert("Please enter valid reward details.");
     return;
   }
-  const rewards = await getRewards();
+  const rewards = await getRewards(); let rewardEditHTML = rewards.map((r, i) => `<li><input id="reward_name_${i}" value="${r.name}" style="width:40%"/> - <input id="reward_cost_${i}" value="${r.cost}" type="number" style="width:60px"/> pts <button onclick="window.updateReward(${i})">💾</button></li>`).join("");
   rewards.push({ name: nameVal, cost: costVal });
   await saveRewards(rewards);
   inputName.value = "";
@@ -147,7 +163,7 @@ window.loadChildView = async function(name) {
     const routines = await getRoutineData();
     const progress = await getProgressData();
     const stats = await getUserStats();
-    const rewards = await getRewards();
+    const rewards = await getRewards(); let rewardEditHTML = rewards.map((r, i) => `<li><input id="reward_name_${i}" value="${r.name}" style="width:40%"/> - <input id="reward_cost_${i}" value="${r.cost}" type="number" style="width:60px"/> pts <button onclick="window.updateReward(${i})">💾</button></li>`).join("");
     const dayName = weekdays[new Date(selectedDate).getDay()];
     const tasks = routines[name]?.[dayName] || [];
     const key = name + "_" + selectedDate;
@@ -231,3 +247,17 @@ window.redeemRewardChild = async function(name, rewardName, cost) {
 };
 
 document.addEventListener("DOMContentLoaded", window.loadDashboard);
+
+window.updateReward = async function(index) {
+  const rewards = await getRewards();
+  const name = document.getElementById(`reward_name_${index}`).value.trim();
+  const cost = parseInt(document.getElementById(`reward_cost_${index}`).value.trim(), 10);
+  if (!name || isNaN(cost)) {
+    alert("Please enter valid name and cost.");
+    return;
+  }
+  rewards[index] = { name, cost };
+  await saveRewards(rewards);
+  alert("Reward updated!");
+  window.loadParentDashboard();
+};
