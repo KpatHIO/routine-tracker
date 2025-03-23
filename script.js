@@ -297,7 +297,26 @@ window.updateAvatar = async function(name, emoji) {
   loadParentDashboard();
 };
 
+
 window.addReward = async function() {
+  const name = document.getElementById("rewardName").value.trim();
+  const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
+  if (!name || isNaN(cost)) {
+    alert("Please enter valid reward details.");
+    return;
+  }
+
+  const rewards = await getRewards();
+  rewards.push({ name, cost });
+  await saveRewards(rewards);
+
+  // Clear inputs
+  document.getElementById("rewardName").value = "";
+  document.getElementById("rewardCost").value = "";
+
+  alert("Reward added!");
+  loadParentDashboard();
+
   const name = document.getElementById("rewardName").value.trim();
   const cost = parseInt(document.getElementById("rewardCost").value.trim(), 10);
   if (!name || isNaN(cost)) {
