@@ -137,3 +137,98 @@ window.saveParentRoutines = async function () {
 };
 
 document.addEventListener("DOMContentLoaded", window.loadDashboard);
+
+
+window.loadChildView = async function(name) {
+  const app = document.getElementById("app");
+  const today = new Date();
+  let selectedDate = today.toISOString().split('T')[0];
+
+  const render = async () => {
+    const routines = await getRoutineData();
+    const progress = await getProgressData();
+    const stats = await getUserStats();
+    const rewards = await getRewards();
+    const dayName = weekdays[new Date(selectedDate).getDay()];
+    const tasks = routines[name]?.[dayName] || [];
+    const key = name + "_" + selectedDate;
+    const done = progress[key] || [];
+    let currentStats = stats[name] || { points: 0, streak: 0, lastCompleted: "" };
+    const isToday = selectedDate === today.toISOString().split('T')[0];
+    const allDone = tasks.length > 0 && tasks.every(task => done.includes(task));
+    if (isToday && allDone && currentStats.lastCompleted !== selectedDate) {
+      currentStats.points += tasks.length;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = yesterday.toISOString().split("T")[0];
+      currentStats.streak = (currentStats.lastCompleted === yesterdayKey) ? currentStats.streak + 1 : 1;
+      currentStats.lastCompleted = selectedDate;
+      stats[name] = currentStats;
+      await saveUserStats(stats);
+    }
+    const displayDate = new Date(selectedDate).toDateString();
+    const streakLine = `<p>⭐ Points: ${currentStats.points} | 🔥 Streak: ${currentStats.streak} days</p>`;
+    const rewardList = rewards.map(r => {
+      const canRedeem = currentStats.points >= r.cost;
+      return `<li>${r.name} - ${r.cost} pts ${canRedeem && isToday ? `<button onclick="window.redeemRewardChild('${name}', '${r.name}', ${r.cost})">Redeem</button>` : ""}</li>`;
+    }).join("");
+
+    app.innerHTML = `
+      <h2>${name}'s Tasks for ${dayName}</h2>
+      <div style="text-align:center;">
+        <button onclick="window.changeDate('${name}', -1)">⬅️</button>
+        <strong>${displayDate}</strong>
+        <button onclick="window.changeDate('${name}', 1)">➡️</button>
+      </div>
+      ${isToday ? streakLine : ""}
+      <ul class="task-list">
+        ${tasks.map((task, i) => `
+          <li>
+            <input type="checkbox" id="task_${i}" ${done.includes(task) ? "checked" : ""} ${!isToday ? "disabled" : ""} onchange="window.toggleTask('${name}', '${selectedDate}', '${task}')">
+            ${task}
+          </li>
+        `).join("")}
+      </ul>
+      <h3>🎁 Rewards</h3>
+      <ul>${rewardList || "No rewards yet."}</ul>
+      <button onclick="window.loadDashboard()">Back</button>
+    `;
+
+    window.currentChild = name;
+    window.currentDate = selectedDate;
+  };
+
+  render();
+};
+
+window.changeDate = function(name, offset) {
+  const newDate = new Date(window.currentDate);
+  newDate.setDate(newDate.getDate() + offset);
+  window.currentDate = newDate.toISOString().split('T')[0];
+  window.loadChildView(name);
+};
+
+window.toggleTask = async function(name, date, task) {
+  const progress = await getProgressData();
+  const key = name + "_" + date;
+  if (!progress[key]) progress[key] = [];
+  if (progress[key].includes(task)) {
+    progress[key] = progress[key].filter(t => t !== task);
+  } else {
+    progress[key].push(task);
+  }
+  await saveProgressData(progress);
+  window.loadChildView(name);
+};
+
+window.redeemRewardChild = async function(name, rewardName, cost) {
+  const stats = await getUserStats();
+  if ((stats[name]?.points || 0) < cost) {
+    alert("Not enough points.");
+    return;
+  }
+  stats[name].points -= cost;
+  await saveUserStats(stats);
+  alert(`${name} redeemed "${rewardName}"!`);
+  window.loadChildView(name);
+};
