@@ -2,18 +2,23 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
-// TODO: Replace with your actual Firebase config values
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyA4Y9BniC1XCveZ-wBS3BsKvF8VFffXloI",
+  authDomain: "routinetracker-3e465.firebaseapp.com",
+  projectId: "routinetracker-3e465",
+  storageBucket: "routinetracker-3e465.firebasestorage.app",
+  messagingSenderId: "387314062824",
+  appId: "1:387314062824:web:898af34ecea35f44aa805d"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 window.db = db;
 
 async function getRoutineData() {
