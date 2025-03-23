@@ -137,3 +137,72 @@ document.addEventListener("DOMContentLoaded", loadDashboard);
 
 
 window.loadDashboard = loadDashboard;
+
+async function getUserStats() {
+  const docRef = doc(db, "shared", "userStats");
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? docSnap.data() : {};
+}
+
+async function saveUserStats(stats) {
+  const docRef = doc(db, "shared", "userStats");
+  await setDoc(docRef, stats);
+}
+
+// Modify loadChildView to include streak/points logic
+window.loadChildView = async function(name) {
+  const app = document.getElementById("app");
+  const today = new Date();
+  let selectedDate = today.toISOString().split('T')[0];
+
+  const render = async () => {
+    const routines = await getRoutineData();
+    const progress = await getProgressData();
+    const stats = await getUserStats();
+
+    const dayName = weekdays[new Date(selectedDate).getDay()];
+    const tasks = routines[name]?.[dayName] || [];
+    const key = name + "_" + selectedDate;
+    const done = progress[key] || [];
+
+    let currentStats = stats[name] || { points: 0, streak: 0, lastCompleted: "" };
+
+    const isToday = selectedDate === today.toISOString().split('T')[0];
+    const allDone = tasks.length > 0 && tasks.every(task => done.includes(task));
+
+    if (isToday && allDone && currentStats.lastCompleted !== selectedDate) {
+      currentStats.points += tasks.length;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = yesterday.toISOString().split("T")[0];
+      currentStats.streak = (currentStats.lastCompleted === yesterdayKey) ? currentStats.streak + 1 : 1;
+      currentStats.lastCompleted = selectedDate;
+      stats[name] = currentStats;
+      await saveUserStats(stats);
+    }
+
+    const streakLine = `<p>⭐ Points: ${currentStats.points} | 🔥 Streak: ${currentStats.streak} days</p>`;
+
+    app.innerHTML = `
+      <h2>${name}'s Tasks for ${dayName}</h2>
+      <input type="date" id="dayPicker" value="${selectedDate}" />
+      ${isToday ? streakLine : ""}
+      <ul class="task-list">
+        ${tasks.map((task, i) => `
+          <li>
+            <input type="checkbox" id="task_${i}" ${done.includes(task) ? "checked" : ""} ${!isToday ? "disabled" : ""} onchange="toggleTask('${name}', '${selectedDate}', '${task}')">
+            ${task}
+          </li>
+        `).join("")}
+      </ul>
+      <button onclick="window.loadDashboard()">Back</button>
+    `;
+
+    document.getElementById("dayPicker").addEventListener("change", async (e) => {
+      selectedDate = e.target.value;
+      render();
+    });
+  };
+
+  render();
+};
