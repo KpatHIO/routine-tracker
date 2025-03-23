@@ -40,6 +40,9 @@ const getRewards = async () => {
   const result = await getDocData("shared", "rewards");
   return Array.isArray(result) ? result : [];
 };
+  const result = await getDocData("shared", "rewards");
+  return Array.isArray(result) ? result : [];
+};
 const saveRewards = (data) => setDocData("shared", "rewards", data);
 
 function renderProfileDashboard(avatars) {
@@ -116,7 +119,7 @@ window.addReward = async function () {
   }
   const rewards = await getRewards();
   rewards.push({ name: nameVal, cost: costVal });
-  await saveRewards(rewards);
+  if (Array.isArray(rewards)) { await saveRewards(rewards); }
   inputName.value = "";
   inputCost.value = "";
   alert("Reward added!");
@@ -208,7 +211,31 @@ window.changeDate = function(name, offset) {
   window.loadChildView(name);
 };
 
+
 window.toggleTask = async function(name, date, task) {
+  const progress = await getProgressData();
+  const stats = await getUserStats();
+  const key = name + "_" + date;
+
+  if (!progress[key]) progress[key] = [];
+
+  const done = progress[key];
+  const isCompleted = done.includes(task);
+  const taskCount = (await getRoutineData())[name]?.[weekdays[new Date(date).getDay()]]?.length || 0;
+
+  if (isCompleted) {
+    progress[key] = done.filter(t => t !== task);
+    stats[name].points = Math.max(0, (stats[name]?.points || 0) - 1);
+  } else {
+    progress[key].push(task);
+    stats[name].points = (stats[name]?.points || 0) + 1;
+  }
+
+  await saveProgressData(progress);
+  await saveUserStats(stats);
+  window.loadChildView(name);
+};
+
   const progress = await getProgressData();
   const key = name + "_" + date;
   if (!progress[key]) progress[key] = [];
