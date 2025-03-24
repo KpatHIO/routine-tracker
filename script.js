@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", window.loadDashboard);
 window.loadChildView = async function(name) {
   const el = document.getElementById("app");
   const today = new Date();
-  let selectedDate = window.currentDate || today.toISOString().split('T')[0];
+let selectedDate = window.currentDate || today.toLocaleDateString('en-CA');
 
   const render = async () => {
     const routines = await getRoutineData();
