@@ -61,13 +61,26 @@ const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 
 window.loadDashboard = function () {
   const el = document.getElementById("app");
-  el.innerHTML = `
+  el.innerHTML = \`
     <h2>Who's checking in?</h2>
-    <button onclick="window.loadChildView('Jay')">Jay</button>
-    <button onclick="window.loadChildView('Casey')">Casey</button>
-    <button onclick="window.loadChildView('Milly')">Milly</button>
-    <button onclick="window.loadParentDashboard()">Parent</button>
-  `;
+    <div class="avatar-dashboard">
+      <button class="avatar-button" onclick="window.loadChildView('Jay')">
+        <img src="https://api.dicebear.com/6.x/thumbs/svg?seed=Jay" alt="Jay" />
+        <span>Jay</span>
+      </button>
+      <button class="avatar-button" onclick="window.loadChildView('Casey')">
+        <img src="https://api.dicebear.com/6.x/thumbs/svg?seed=Casey" alt="Casey" />
+        <span>Casey</span>
+      </button>
+      <button class="avatar-button" onclick="window.loadChildView('Milly')">
+        <img src="https://api.dicebear.com/6.x/thumbs/svg?seed=Milly" alt="Milly" />
+        <span>Milly</span>
+      </button>
+    </div>
+    <div style="text-align:center;">
+      <button class="parent-button" onclick="window.loadParentDashboard()">Parent</button>
+    </div>
+  \`;
 };
 
 window.loadChildView = async function(name) {
@@ -95,7 +108,7 @@ window.loadChildView = async function(name) {
     }).join("");
 
     el.innerHTML = `
-      <h2>${name}'s Tasks for ${dayName}</h2>
+      <h2><img src='https://api.dicebear.com/6.x/thumbs/svg?seed=${name}' alt='${name}' style='width:60px;height:60px;border-radius:50%;vertical-align:middle;margin-right:10px;'> ${name}'s Tasks for ${dayName}</h2>
       <div style="text-align:center;">
         <button onclick="window.changeDate('${name}', -1)">⬅️</button>
         <strong>${displayDate}</strong>
