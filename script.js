@@ -61,7 +61,7 @@ const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 
 window.loadDashboard = function () {
   const el = document.getElementById("app");
-  el.innerHTML = \`
+  el.innerHTML = `
     <h2>Who's checking in?</h2>
     <div class="avatar-dashboard">
       <button class="avatar-button" onclick="window.loadChildView('Jay')">
