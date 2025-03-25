@@ -177,7 +177,7 @@ let selectedDate = window.currentDate || today.toLocaleDateString('en-CA');
     const key = name + "_" + selectedDate;
     const done = progress[key] || [];
     let currentStats = stats[name] || { points: 0, streak: 0, lastCompleted: "" };
-    const isToday = selectedDate === today.toISOString().split('T')[0];
+    const isToday = selectedDate === today.toLocaleDateString('en-CA');
 
     const displayDate = new Date(selectedDate).toDateString();
     const streakLine = `<p>⭐ Points: ${currentStats.points} | 🔥 Streak: ${currentStats.streak} days</p>`;
@@ -217,7 +217,7 @@ let selectedDate = window.currentDate || today.toLocaleDateString('en-CA');
 window.changeDate = function(name, offset) {
   const newDate = new Date(window.currentDate);
   newDate.setDate(newDate.getDate() + offset);
-  window.currentDate = newDate.toISOString().split('T')[0];
+  window.currentDate = newDate.toLocaleDateString('en-CA');
   window.loadChildView(name);
 };
 
